@@ -1,4 +1,13 @@
-# Snapchat-Streak-Recovery-Automation
+# SnapCovery
+
+## Demo
+<div style="display: flex;">
+    <img width="500" alt="Screenshot 2025-03-11 at 7 13 41 PM" src="https://github.com/user-attachments/assets/a496f1c6-441d-48fa-a459-523f7dbe9250" />
+    <img width="500" alt="Screenshot 2025-03-11 at 7 13 28 PM" src="https://github.com/user-attachments/assets/44b2b378-ff2f-4e7e-a02e-711c24484bb8" />
+</div>
+
+
+
 
 ## Overview
 This project provides a web-based dashboard to automate the Snapchat streak recovery process. It uses Selenium for browser automation, Flask for the web interface, and Excel files to store the friend list and execution results. Users can update their own contact details (username, email, mobile), manage a list of friend usernames, and trigger the streak recovery process with a single click.
