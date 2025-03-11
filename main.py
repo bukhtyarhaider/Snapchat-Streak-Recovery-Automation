@@ -97,7 +97,6 @@ friend_list = load_friends()
 def index():
     global friend_list, user_details
     if request.method == 'POST':
-        # Distinguish between friend addition and user details update via a hidden input field.
         action = request.form.get('action')
         if action == 'add_friend':
             new_friend = request.form.get('friend_username')
@@ -111,6 +110,15 @@ def index():
             user_details['MY_MOBILE'] = request.form.get('my_mobile')
         return redirect(url_for('index'))
     return render_template('index.html', friends=friend_list, user_details=user_details)
+
+@app.route('/remove_friend', methods=['POST'])
+def remove_friend():
+    global friend_list
+    friend = request.form.get('friend_username')
+    if friend in friend_list:
+        friend_list.remove(friend)
+        save_friends(friend_list)
+    return redirect(url_for('index'))
 
 @app.route('/execute', methods=['POST'])
 def execute():
