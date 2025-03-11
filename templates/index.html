@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Streak Recovery - Dashboard</title>
+</head>
+<body>
+    <h1>Streak Recovery Dashboard</h1>
+
+    <!-- Form to update user details -->
+    <h2>User Details</h2>
+    <form method="POST">
+        <input type="hidden" name="action" value="update_settings">
+        <label for="my_username">Username:</label>
+        <input type="text" id="my_username" name="my_username" value="{{ user_details.MY_USERNAME }}" required>
+        <br>
+        <label for="my_email">Email:</label>
+        <input type="email" id="my_email" name="my_email" value="{{ user_details.MY_EMAIL }}" required>
+        <br>
+        <label for="my_mobile">Mobile Number:</label>
+        <input type="text" id="my_mobile" name="my_mobile" value="{{ user_details.MY_MOBILE }}" required>
+        <br>
+        <button type="submit">Update User Details</button>
+    </form>
+
+    <hr>
+
+    <!-- Form to add a friend -->
+    <h2>Add Friend Username for Streak Recovery</h2>
+    <form method="POST">
+        <input type="hidden" name="action" value="add_friend">
+        <input type="text" name="friend_username" placeholder="Enter friend username" required>
+        <button type="submit">Add Friend</button>
+    </form>
+
+    <!-- Button to execute streak recovery -->
+    <h2>Execute Streak Recovery</h2>
+    <form method="POST" action="{{ url_for('execute') }}">
+        <button type="submit">Execute Streak Recovery</button>
+    </form>
+
+    <!-- Display current friend list -->
+    <h2>Current Friend List</h2>
+    <ul>
+        {% for friend in friends %}
+            <li>{{ friend }}</li>
+        {% else %}
+            <li>No friends added yet.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

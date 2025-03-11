@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Execution Results</title>
+</head>
+<body>
+    <h1>Streak Recovery Execution Results</h1>
+    <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+            <th>Friend Username</th>
+            <th>Status</th>
+        </tr>
+        {% for result in results %}
+        <tr>
+            <td>{{ result.friend_username }}</td>
+            <td>{{ result.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="{{ url_for('index') }}">Back to Dashboard</a>
+</body>
+</html>
