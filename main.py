@@ -1,100 +1,122 @@
+from flask import Flask, render_template, request, redirect, url_for
 import pandas as pd
+import os
+import time
+
+# Selenium Imports
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-import time
 
-# -------------------------------
-# Configuration
-# -------------------------------
-# Your static form details (update these as needed)
-MY_USERNAME = "your_username"
-MY_EMAIL = "your_email@example.com"
-MY_MOBILE = "1234567890"
+app = Flask(__name__)
 
-# URL for the streak recovery form
-URL = "https://help.snapchat.com/hc/en-us/requests/new?co=true&ticket_form_id=149423"
+# Files and column name
+FRIENDS_FILE = 'friends.xlsx'
+FRIENDS_COLUMN = 'friend_username'
 
-# XPaths for form fields
+# Streak recovery form details (constant)
+FORM_URL = "https://help.snapchat.com/hc/en-us/requests/new?co=true&ticket_form_id=149423"
 USERNAME_XPATH = "//*[@id='request_custom_fields_24281229']"
 EMAIL_XPATH = "//*[@id='request_custom_fields_24335325']"
 MOBILE_XPATH = "//*[@id='request_custom_fields_24369716']"
 FRIEND_USERNAME_XPATH = "//*[@id='request_custom_fields_24369736']"
 SUBMIT_BUTTON_XPATH = "//*[@id='new_request']/footer/input"
 
-# -------------------------------
-# Read Friend List
-# -------------------------------
-# Ensure you have a file named "friends.xlsx" with a column "friend_username"
-friend_df = pd.read_excel("friends.xlsx")
+# Global variables to store friend list and user details.
+friend_list = []
+user_details = {
+    "MY_USERNAME": "",
+    "MY_EMAIL": "",
+    "MY_MOBILE": ""
+}
 
-# This list will store the outcome for each friend submission
-results = []
+def load_friends():
+    """Load the friend list from an Excel file."""
+    if os.path.exists(FRIENDS_FILE):
+        df = pd.read_excel(FRIENDS_FILE)
+        return df[FRIENDS_COLUMN].tolist() if FRIENDS_COLUMN in df.columns else []
+    else:
+        return []
 
-# -------------------------------
-# Setup ChromeDriver with Selenium
-# -------------------------------
-options = webdriver.ChromeOptions()
-# Uncomment the line below to run in headless mode if desired
-# options.add_argument("--headless")
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+def save_friends(friends):
+    """Save the friend list to an Excel file."""
+    df = pd.DataFrame({FRIENDS_COLUMN: friends})
+    df.to_excel(FRIENDS_FILE, index=False)
 
-# -------------------------------
-# Process Each Friend
-# -------------------------------
-for index, row in friend_df.iterrows():
-    friend_username = row["friend_username"]
-    status = "Failed"  # Default status
-    
-    try:
-        # Load the recovery form page
-        driver.get(URL)
-        time.sleep(2)  # wait for the page to fully load
-        
-        # Fill in the Username field
-        username_field = driver.find_element(By.XPATH, USERNAME_XPATH)
-        username_field.clear()
-        username_field.send_keys(MY_USERNAME)
-        
-        # Fill in the Email field
-        email_field = driver.find_element(By.XPATH, EMAIL_XPATH)
-        email_field.clear()
-        email_field.send_keys(MY_EMAIL)
-        
-        # Fill in the Mobile Number field
-        mobile_field = driver.find_element(By.XPATH, MOBILE_XPATH)
-        mobile_field.clear()
-        mobile_field.send_keys(MY_MOBILE)
-        
-        # Fill in the Friend's Username field with the current friend
-        friend_username_field = driver.find_element(By.XPATH, FRIEND_USERNAME_XPATH)
-        friend_username_field.clear()
-        friend_username_field.send_keys(friend_username)
-        
-        # Submit the form
-        submit_button = driver.find_element(By.XPATH, SUBMIT_BUTTON_XPATH)
-        submit_button.click()
-        
-        # Allow some time for the submission to process (adjust if needed)
-        time.sleep(3)
-        
-        # Optionally, add logic to verify if submission was successful.
-        # For now, if no exception is raised, we'll consider it successful.
-        status = "Success"
-    except Exception as e:
-        print(f"Error processing friend '{friend_username}': {e}")
+def execute_streak_recovery(friends):
+    """Execute the streak recovery automation for each friend using user-supplied details."""
+    results = []
+
+    # Setup ChromeDriver
+    options = webdriver.ChromeOptions()
+    # Uncomment the next line to run headless:
+    # options.add_argument("--headless")
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+    for friend in friends:
         status = "Failed"
-    
-    # Record the result
-    results.append({"friend_username": friend_username, "status": status})
+        try:
+            driver.get(FORM_URL)
+            time.sleep(2)  # wait for the page to load
 
-# Close the browser once done
-driver.quit()
+            # Fill in the form using user_details and current friend
+            driver.find_element(By.XPATH, USERNAME_XPATH).clear()
+            driver.find_element(By.XPATH, USERNAME_XPATH).send_keys(user_details['MY_USERNAME'])
 
-# -------------------------------
-# Save the Results
-# -------------------------------
-results_df = pd.DataFrame(results)
-results_df.to_excel("results.xlsx", index=False)
-print("Process completed. Results saved to results.xlsx")
+            driver.find_element(By.XPATH, EMAIL_XPATH).clear()
+            driver.find_element(By.XPATH, EMAIL_XPATH).send_keys(user_details['MY_EMAIL'])
+
+            driver.find_element(By.XPATH, MOBILE_XPATH).clear()
+            driver.find_element(By.XPATH, MOBILE_XPATH).send_keys(user_details['MY_MOBILE'])
+
+            driver.find_element(By.XPATH, FRIEND_USERNAME_XPATH).clear()
+            driver.find_element(By.XPATH, FRIEND_USERNAME_XPATH).send_keys(friend)
+
+            # Submit the form
+            driver.find_element(By.XPATH, SUBMIT_BUTTON_XPATH).click()
+            time.sleep(3)  # wait for submission to process
+
+            status = "Success"
+        except Exception as e:
+            print(f"Error processing friend '{friend}': {e}")
+            status = "Failed"
+        results.append({"friend_username": friend, "status": status})
+
+    driver.quit()
+
+    # Save results to an Excel file
+    results_df = pd.DataFrame(results)
+    results_df.to_excel("results.xlsx", index=False)
+    return results
+
+# Load friend list on startup
+friend_list = load_friends()
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    global friend_list, user_details
+    if request.method == 'POST':
+        # Distinguish between friend addition and user details update via a hidden input field.
+        action = request.form.get('action')
+        if action == 'add_friend':
+            new_friend = request.form.get('friend_username')
+            if new_friend:
+                friend_list.append(new_friend)
+                save_friends(friend_list)
+        elif action == 'update_settings':
+            # Update the user details with the submitted values
+            user_details['MY_USERNAME'] = request.form.get('my_username')
+            user_details['MY_EMAIL'] = request.form.get('my_email')
+            user_details['MY_MOBILE'] = request.form.get('my_mobile')
+        return redirect(url_for('index'))
+    return render_template('index.html', friends=friend_list, user_details=user_details)
+
+@app.route('/execute', methods=['POST'])
+def execute():
+    # Execute streak recovery automation for the current friend list using the latest user details.
+    results = execute_streak_recovery(friend_list)
+    return render_template("execute.html", results=results)
+
+if __name__ == '__main__':
+    app.run(debug=True)
