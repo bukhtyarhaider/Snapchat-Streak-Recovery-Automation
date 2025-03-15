@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage Snapchat Friends - SnapCovery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
+        integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #F0F4F8; }
+    .nav-link:hover { color: #F59E0B; }
+    .card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1),
+                  0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+    .snap-btn {
+      background: #FFFC00;
+      color: #1F2937;
+      font-weight: 600;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .snap-btn:hover {
+      background: #FFF200;
+      transform: translateY(-2px);
+    }
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      border-bottom: 4px solid transparent;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.3s ease, color 0.3s ease;
+      color: #4B5563;
+    }
+    .tab-btn.active {
+      border-color: #FFFC00;
+      color: #1F2937;
+    }
+    .search-input {
+      border: 2px solid #d1d5db;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+    .search-input:focus {
+      border-color: #FFFC00;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Navigation Bar -->
+  <nav class="bg-white fixed w-full z-50 shadow">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <i class="fab fa-snapchat fa-2x text-yellow-500"></i>
+        <span class="text-2xl font-bold text-gray-800">SnapCovery</span>
+      </div>
+      <div class="hidden md:flex space-x-6">
+        <a href="{{ url_for('index') }}" class="nav-link text-gray-800 hover:text-amber-500 font-medium">Dashboard</a>
+        <a href="{{ url_for('profile') }}" class="nav-link text-gray-800 hover:text-amber-500 font-medium">Profile</a>
+        <a href="{{ url_for('friends_page') }}" class="nav-link text-gray-800 hover:text-amber-500 font-medium">Friends</a>
+      </div>
+      <div class="md:hidden">
+        <button id="menuButton" class="text-gray-800 focus:outline-none">
+          <i class="fas fa-bars fa-lg"></i>
+        </button>
+      </div>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden bg-white">
+      <a href="{{ url_for('index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Dashboard</a>
+      <a href="{{ url_for('profile') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Profile</a>
+      <a href="{{ url_for('friends_page') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Friends</a>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="pt-24 pb-12 bg-gradient-to-r from-yellow-400 to-yellow-300">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-4xl font-extrabold text-gray-900">Manage Snapchat Friends</h1>
+      <p class="mt-2 text-lg text-gray-700">Add new friends or manage your existing friend lists for recovery</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8 space-y-12">
+    <!-- Main Tabs -->
+    <div class="flex justify-center mb-8 space-x-6">
+      <button id="addTab" class="tab-btn">Add Friends</button>
+      <button id="manageTab" class="tab-btn active">Manage Friends</button>
+    </div>
+
+    <!-- Add Friends Tab Content -->
+    <div id="addContent" class="hidden">
+      <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2">
+        <!-- Manual Add Form -->
+        <div class="card p-8">
+          <h2 class="text-2xl font-semibold text-center mb-4">Add Friend Manually</h2>
+          <form method="POST">
+            <div class="flex flex-col gap-4">
+              <input type="text" name="friend_username" placeholder="Enter friend username" required class="border border-gray-300 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-300" />
+              <input type="text" name="friend_image" placeholder="Enter image URL (optional)" class="border border-gray-300 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-300" />
+              <button type="submit" class="snap-btn px-6 py-3 rounded">
+                <i class="fas fa-plus mr-2"></i> Add
+              </button>
+            </div>
+          </form>
+        </div>
+        <!-- CSV Import Form -->
+        <div class="card p-8">
+          <h2 class="text-2xl font-semibold text-center mb-4">Import Friends from CSV</h2>
+          <form method="POST" enctype="multipart/form-data">
+            <div class="mb-6">
+              <input type="file" name="csv_file" accept=".csv" required class="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-300" />
+            </div>
+            <button type="submit" class="snap-btn w-full px-6 py-3 rounded">
+              <i class="fas fa-upload mr-2"></i> Upload CSV
+            </button>
+          </form>
+        </div>
+      </div>
+      <!-- CTA for Chrome Extension -->
+      <div class="card p-8 mt-8">
+        <h2 class="text-2xl font-semibold text-center mb-4">Export Friends via Chrome Extension</h2>
+        <div class="text-center">
+          <p class="mb-4 text-gray-700">Export your Snapchat friends to CSV using our open source Chrome extension.</p>
+          <a href="https://github.com/bukhtyarhaider/snapchat-friend-exporter" target="_blank" class="snap-btn inline-block px-6 py-3 rounded">
+            Get the Extension
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manage Friends Tab Content -->
+    <div id="manageContent">
+      <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2">
+      <!-- All Friends List with Realtime Search -->
+      <div class="card p-8">
+        <h2 class="text-2xl font-semibold text-center mb-4">All Friends</h2>
+        <div class="mb-4">
+          <input type="text" id="searchInput" placeholder="Search friends..." class="search-input" />
+        </div>
+        <ul id="allFriendsList" class="divide-y divide-gray-200">
+          {% for friend in friends %}
+          <li class="friend-item flex items-center justify-between py-3 px-4">
+            <div class="flex items-center space-x-4">
+              {% if friend.friend_image %}
+              <img src="{{ friend.friend_image }}" alt="{{ friend.friend_username }}" class="w-10 h-10 rounded-full object-cover" />
+              {% else %}
+              <img src="https://via.placeholder.com/40" alt="No image" class="w-10 h-10 rounded-full object-cover" />
+              {% endif %}
+              <span class="text-gray-800 font-medium">{{ friend.friend_username }}</span>
+            </div>
+            <div class="flex space-x-2">
+              <!-- Button to add to Selected Friends -->
+              <form method="POST" action="{{ url_for('select_friend') }}">
+                <input type="hidden" name="friend_username" value="{{ friend.friend_username }}" />
+                <button type="submit" class="snap-btn px-4 py-2 rounded">
+                  <i class="fas fa-check"></i>
+                </button>
+              </form>
+              <!-- Remove Friend -->
+              <form method="POST" action="{{ url_for('remove_friend') }}">
+                <input type="hidden" name="friend_username" value="{{ friend.friend_username }}" />
+                <button type="submit" class="snap-btn px-4 py-2 rounded-full">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </form>
+            </div>
+          </li>
+          {% else %}
+          <li class="py-3 text-center text-gray-600">No friends added yet.</li>
+          {% endfor %}
+        </ul>
+        <div class="mt-4 text-center">
+          <form method="POST" action="{{ url_for('remove_all_friends') }}">
+            <button type="submit" class="snap-btn px-6 py-3 rounded">
+              <i class="fas fa-trash mr-2"></i> Remove All Friends
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Selected Friends List -->
+      <div class="card p-8">
+        <h2 class="text-2xl font-semibold text-center mb-4">Selected Friends for Recovery</h2>
+        <ul class="divide-y divide-gray-200">
+          {% for friend in selected %}
+          <li class="flex items-center justify-between py-3 px-4">
+            <div class="flex items-center space-x-4">
+              {% if friend.friend_image %}
+              <img src="{{ friend.friend_image }}" alt="{{ friend.friend_username }}" class="w-10 h-10 rounded-full object-cover" />
+              {% else %}
+              <img src="https://via.placeholder.com/40" alt="No image" class="w-10 h-10 rounded-full object-cover" />
+              {% endif %}
+              <span class="text-gray-800 font-medium">{{ friend.friend_username }}</span>
+            </div>
+            <div>
+              <form method="POST" action="{{ url_for('deselect_friend') }}">
+                <input type="hidden" name="friend_username" value="{{ friend.friend_username }}" />
+                <button type="submit" class="snap-btn px-4 py-2 rounded">
+                  <i class="fas fa-minus"></i>
+                </button>
+              </form>
+            </div>
+          </li>
+          {% else %}
+          <li class="py-3 text-center text-gray-600">No friends selected yet.</li>
+          {% endfor %}
+        </ul>
+        <div class="mt-4 text-center">
+          <form method="POST" action="{{ url_for('clear_selected_friends') }}">
+            <button type="submit" class="snap-btn px-6 py-3 rounded">
+              <i class="fas fa-eraser mr-2"></i> Clear Selected
+            </button>
+          </form>
+        </div>
+      </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Toggle mobile menu
+    const menuButton = document.getElementById('menuButton');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuButton.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+
+    // Main tab switching logic
+    const addTab = document.getElementById('addTab');
+    const manageTab = document.getElementById('manageTab');
+    const addContent = document.getElementById('addContent');
+    const manageContent = document.getElementById('manageContent');
+    
+    // Default tab: Manage Friends is visible
+    addContent.classList.add('hidden');
+    manageContent.classList.remove('hidden');
+    addTab.classList.remove('active');
+    manageTab.classList.add('active');
+
+    addTab.addEventListener('click', () => {
+      addTab.classList.add('active');
+      manageTab.classList.remove('active');
+      addContent.classList.remove('hidden');
+      manageContent.classList.add('hidden');
+    });
+    
+    manageTab.addEventListener('click', () => {
+      manageTab.classList.add('active');
+      addTab.classList.remove('active');
+      manageContent.classList.remove('hidden');
+      addContent.classList.add('hidden');
+    });
+
+    // Realtime search for All Friends list
+    const searchInput = document.getElementById('searchInput');
+    const allFriendsList = document.getElementById('allFriendsList');
+    searchInput.addEventListener('input', () => {
+      const filter = searchInput.value.toLowerCase();
+      const items = allFriendsList.getElementsByClassName('friend-item');
+      Array.from(items).forEach(item => {
+        const friendName = item.querySelector('span').textContent.toLowerCase();
+        if (friendName.indexOf(filter) > -1) {
+          item.style.display = "";
+        } else {
+          item.style.display = "none";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

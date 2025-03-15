@@ -1,94 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Snap Streak Recovery Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SnapStreak Recovery Dashboard - SnapCovery</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: #F0F4F8; 
+    }
+    .card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1),
+                  0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+    .snap-btn {
+      background: #FFFC00;
+      color: #1F2937;
+      font-weight: 600;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .snap-btn:hover {
+      background: #FFF200;
+      transform: translateY(-2px);
+    }
+    .icon-lg {
+      font-size: 2rem;
+    }
+  </style>
 </head>
-<body class="bg-gray-100">
+<body>
   <!-- Navigation Bar -->
-  <nav class="bg-yellow-300 shadow p-4 flex items-center justify-center space-x-2">
-    <i class="fab fa-snapchat fa-2x text-gray-800"></i>
-    <h1 class="text-center text-2xl font-bold text-gray-800">SnapCovery</h1>
-  </nav>
-  <!-- Dashboard Container -->
-  <div class="container mx-auto p-4">
-    <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      <!-- User Details Card -->
-      <div class="bg-white shadow rounded-lg p-6">
-        <h2 class="text-xl font-semibold border-b-2 border-yellow-300 pb-2 mb-4 flex items-center space-x-2">
-          <i class="fas fa-user-circle text-yellow-500"></i>
-          <span>User Details</span>
-        </h2>
-        <form method="POST">
-          <input type="hidden" name="action" value="update_settings">
-          <div class="mb-4">
-            <label for="my_username" class="block font-medium mb-1">Username</label>
-            <input type="text" id="my_username" name="my_username" value="{{ user_details.MY_USERNAME }}" required class="w-full border rounded px-3 py-2">
-          </div>
-          <div class="mb-4">
-            <label for="my_email" class="block font-medium mb-1">Email</label>
-            <input type="email" id="my_email" name="my_email" value="{{ user_details.MY_EMAIL }}" required class="w-full border rounded px-3 py-2">
-          </div>
-          <div class="mb-4">
-            <label for="my_mobile" class="block font-medium mb-1">Mobile Number</label>
-            <input type="text" id="my_mobile" name="my_mobile" value="{{ user_details.MY_MOBILE }}" required class="w-full border rounded px-3 py-2">
-          </div>
-          <button type="submit" class="w-full bg-yellow-300 hover:bg-yellow-400 text-gray-800 font-bold py-2 rounded">
-            Update
-          </button>
-        </form>
+  <nav class="bg-white fixed w-full z-50 shadow">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <i class="fab fa-snapchat icon-lg text-yellow-500"></i>
+        <span class="text-2xl font-bold text-gray-800">SnapCovery</span>
       </div>
-      <!-- Friend List Card -->
-      <div class="bg-white shadow rounded-lg p-6">
-        <h2 class="text-xl font-semibold border-b-2 border-yellow-300 pb-2 mb-4 flex items-center space-x-2">
-          <i class="fas fa-users text-yellow-500"></i>
-          <span>Friend List</span>
-        </h2>
-        <form method="POST" class="mb-4">
-          <input type="hidden" name="action" value="add_friend">
-          <div class="flex">
-            <input type="text" name="friend_username" placeholder="Enter friend username" required class="w-full border rounded-l px-3 py-2">
-            <button type="submit" class="bg-yellow-300 hover:bg-yellow-400 text-gray-800 font-bold px-4 rounded-r flex items-center">
-              <i class="fas fa-plus mr-1"></i>
-              Friend
-            </button>
-          </div>
-        </form>
-        <ul class="divide-y divide-gray-200">
-          {% for friend in friends %}
-            <li class="flex justify-between items-center py-2">
-              <span>{{ friend }}</span>
-              <form method="POST" action="{{ url_for('remove_friend') }}">
-                <input type="hidden" name="friend_username" value="{{ friend }}">
-                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded flex items-center">
-                  <i class="fas fa-trash-alt mr-1"></i>
-                  Remove
-                </button>
-              </form>
-            </li>
-          {% else %}
-            <li class="py-2">No friends added yet.</li>
-          {% endfor %}
-        </ul>
+      <div class="hidden md:flex space-x-6">
+        <a href="{{ url_for('index') }}" class="text-gray-800 hover:text-amber-500 font-medium">
+         Dashboard</a>
+        <a href="{{ url_for('profile') }}" class="text-gray-800 hover:text-amber-500 font-medium">
+        Profile</a>
+        <a href="{{ url_for('friends_page') }}" class="text-gray-800 hover:text-amber-500 font-medium">
+         Friends</a>
       </div>
-      <!-- Execute Recovery Card -->
-    <div class="bg-white shadow rounded-lg p-6 flex flex-col justify-between">
-        <h2 class="text-xl font-semibold border-b-2 border-yellow-300 pb-2 mb-4 flex items-center space-x-2">
-        <i class="fas fa-bolt text-yellow-500"></i>
-        <span>Execute Recovery</span>
-        </h2>
-        <form method="POST" action="{{ url_for('execute') }}">
-        <button type="submit" 
-            class="w-full bg-yellow-300 hover:bg-yellow-400 text-gray-800 font-bold py-2 rounded flex items-center justify-center {% if friends|length == 0 %}opacity-50 cursor-not-allowed{% endif %}" 
-            {% if friends|length == 0 %}disabled{% endif %}>
-            <i class="fas fa-play mr-2"></i>
-            Execute Streak Recovery
+      <div class="md:hidden">
+        <button id="menuButton" class="text-gray-800 focus:outline-none">
+          <i class="fas fa-bars fa-lg"></i>
         </button>
-        </form>
+      </div>
     </div>
-  </div>
+    <div id="mobileMenu" class="hidden md:hidden bg-white">
+      <a href="{{ url_for('index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Dashboard</a>
+      <a href="{{ url_for('profile') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Profile</a>
+      <a href="{{ url_for('friends_page') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Friends</a>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <header class="pt-24 pb-12 bg-gradient-to-r from-yellow-400 to-yellow-300">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-4xl font-extrabold text-gray-900">SnapStreak Recovery Dashboard</h1>
+      <p class="mt-2 text-lg text-gray-700">Recover your streaks with ease!</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8 space-y-12">
+    <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <!-- Profile Summary Card -->
+      <div class="card p-8">
+        <div class="flex justify-center mb-4">
+          <i class="fas fa-user icon-lg text-amber-500"></i>
+        </div>
+        <h2 class="text-2xl font-semibold text-center mb-4">Profile Summary</h2>
+        <p class="text-center text-gray-800"><strong>Username:</strong> {{ user_details.MY_USERNAME or "Not set" }}</p>
+        <p class="text-center text-gray-800"><strong>Email:</strong> {{ user_details.MY_EMAIL or "Not set" }}</p>
+        <p class="text-center text-gray-800"><strong>Mobile:</strong> {{ user_details.MY_MOBILE or "Not set" }}</p>
+        <div class="mt-6 text-center">
+          <a href="{{ url_for('profile') }}" class="snap-btn px-6 py-3 rounded">
+            <i class="fas fa-edit mr-1"></i> Update Profile
+          </a>
+        </div>
+      </div>
+
+      <!-- Friends Summary Card -->
+      <div class="card p-8">
+        <div class="flex justify-center mb-4">
+          <i class="fas fa-users icon-lg text-amber-500"></i>
+        </div>
+        <h2 class="text-2xl font-semibold text-center mb-4">Friends Summary</h2>
+        <p class="text-center text-gray-800">
+          <strong>Total Friends:</strong> {{ friends|length }}
+        </p>
+        <p class="text-center text-gray-800">
+          <strong>Selected Friends:</strong> {{ selected|length if selected is defined else 0 }}
+        </p>
+        <div class="mt-6 text-center">
+          <a href="{{ url_for('friends_page') }}" class="snap-btn px-6 py-3 rounded">
+            <i class="fas fa-cog mr-1"></i> Manage Friends
+          </a>
+        </div>
+      </div>
+
+      <!-- Execute Recovery Card -->
+      <div class="card p-8 flex flex-col justify-between">
+        <div class="flex justify-center mb-4">
+          <i class="fas fa-play icon-lg text-amber-500"></i>
+        </div>
+        <h2 class="text-2xl font-semibold text-center mb-4">Execute Recovery</h2>
+        <div class="mt-6 text-center">
+          <a href="{{ url_for('execute_page') }}" class="snap-btn w-full px-6 py-3 rounded {% if friends|length == 0 %}opacity-50 cursor-not-allowed{% endif %}" {% if friends|length == 0 %}onclick="return false;"{% endif %}>
+            <i class="fas fa-rocket mr-2"></i> Execute Streak Recovery
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA Section for Chrome Extension -->
+    <section class="card p-8">
+      <h2 class="text-2xl font-semibold text-center mb-4">Export Your Snapchat Friends</h2>
+      <div class="text-center">
+        <p class="mb-4 text-gray-700">Use our open source Chrome extension to export your Snapchat friends to CSV. Then, import the CSV into SnapCovery for streak recovery.</p>
+        <a href="https://github.com/bukhtyarhaider/snapchat-friend-exporter" target="_blank" class="snap-btn inline-block px-6 py-3 rounded">
+          <i class="fab fa-github mr-2"></i> View Chrome Extension on GitHub
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const menuButton = document.getElementById('menuButton');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+  </script>
 </body>
 </html>
