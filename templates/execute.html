@@ -1,50 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Execution Results - Snap Streak Recovery</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Execution Results - SnapCovery</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    integrity="sha512-..."
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #F0F4F8;
+    }
+    .card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1),
+                  0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+    .snap-btn {
+      background: #FFFC00;
+      color: #1F2937;
+      font-weight: 600;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .snap-btn:hover {
+      background: #FFF200;
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
-<body class="bg-gray-100">
+<body>
   <!-- Navigation Bar -->
-  <nav class="bg-yellow-300 shadow p-4 flex items-center justify-center space-x-2">
-    <i class="fab fa-snapchat fa-2x text-gray-800"></i>
-    <h1 class="text-center text-2xl font-bold text-gray-800">Execution Results</h1>
-  </nav>
-  <!-- Results Container -->
-  <div class="container mx-auto p-4">
-    <div class="bg-white shadow rounded-lg p-6">
-      <h2 class="text-xl font-semibold border-b-2 border-yellow-300 pb-2 mb-4 flex items-center space-x-2">
-        <i class="fas fa-info-circle text-yellow-500"></i>
-        <span>Streak Recovery Execution Results</span>
-      </h2>
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead>
-            <tr>
-              <th class="px-6 py-3 bg-yellow-300 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Friend Username</th>
-              <th class="px-6 py-3 bg-yellow-300 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Status</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            {% for result in results %}
-            <tr>
-              <td class="px-6 py-4 whitespace-nowrap">{{ result.friend_username }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">{{ result.status }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+  <nav class="bg-white fixed w-full z-50 shadow">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <i class="fab fa-snapchat fa-2x text-yellow-500"></i>
+        <span class="text-2xl font-bold text-gray-800">SnapCovery</span>
       </div>
-      <div class="mt-6">
-        <a href="{{ url_for('index') }}" class="block w-full bg-yellow-300 hover:bg-yellow-400 text-gray-800 font-bold text-center py-2 rounded flex items-center justify-center">
-          <i class="fas fa-arrow-left mr-2"></i>
-          Back to Dashboard
-        </a>
+      <div class="hidden md:flex space-x-6">
+        <a href="{{ url_for('index') }}" class="text-gray-800 hover:text-amber-500 font-medium">Dashboard</a>
+        <a href="{{ url_for('profile') }}" class="text-gray-800 hover:text-amber-500 font-medium">Profile</a>
+        <a href="{{ url_for('friends_page') }}" class="text-gray-800 hover:text-amber-500 font-medium">Friends</a>
+      </div>
+      <div class="md:hidden">
+        <button id="menuButton" class="text-gray-800 focus:outline-none">
+          <i class="fas fa-bars fa-lg"></i>
+        </button>
       </div>
     </div>
-  </div>
+    <div id="mobileMenu" class="hidden md:hidden bg-white">
+      <a href="{{ url_for('index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Dashboard</a>
+      <a href="{{ url_for('profile') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Profile</a>
+      <a href="{{ url_for('friends_page') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Friends</a>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <header class="pt-24 pb-12 bg-gradient-to-r from-yellow-400 to-yellow-300">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-4xl font-extrabold text-gray-900">Streak Recovery Execution</h1>
+      <p class="mt-2 text-lg text-gray-700">Real-time progress and detailed report</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <div class="card p-8">
+      <!-- Progress Bar -->
+      <div class="mb-6">
+        <div class="w-full bg-gray-200 rounded-full">
+          <div id="progressBar" class="bg-yellow-300 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: 0%;">0%</div>
+        </div>
+      </div>
+      <!-- Logs -->
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold mb-4">Execution Logs</h2>
+        <ul id="logList" class="list-disc pl-5 text-gray-700"></ul>
+      </div>
+      <!-- Detailed Report -->
+      <div id="reportSection" class="mb-6 hidden">
+        <h2 class="text-xl font-semibold mb-4">Detailed Report</h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr>
+                <th class="px-6 py-3 bg-yellow-300 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Friend Username</th>
+                <th class="px-6 py-3 bg-yellow-300 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody id="reportBody" class="bg-white divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="text-center">
+        <a href="{{ url_for('index') }}" class="snap-btn px-6 py-3 rounded">Back to Dashboard</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+  <script>
+    const socket = io('/execute');
+
+    socket.on('connect', function() {
+      console.log('Connected for execution updates.');
+      socket.emit('start_execution');
+    });
+
+    socket.on('progress_update', function(data) {
+      console.log(data);
+      // Update progress bar.
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.width = data.progress + '%';
+      progressBar.innerText = data.progress + '%';
+
+      // Append log message.
+      const logList = document.getElementById('logList');
+      const li = document.createElement('li');
+      li.innerText = data.log;
+      logList.appendChild(li);
+
+      // Show detailed report if available.
+      if (data.final_results) {
+        const reportSection = document.getElementById('reportSection');
+        reportSection.classList.remove('hidden');
+        const reportBody = document.getElementById('reportBody');
+        data.final_results.forEach(result => {
+          const tr = document.createElement('tr');
+          const td1 = document.createElement('td');
+          td1.className = "px-6 py-4 whitespace-nowrap";
+          td1.innerText = result.friend_username;
+          const td2 = document.createElement('td');
+          td2.className = "px-6 py-4 whitespace-nowrap";
+          td2.innerText = result.status;
+          tr.appendChild(td1);
+          tr.appendChild(td2);
+          reportBody.appendChild(tr);
+        });
+      }
+    });
+
+    const menuButton = document.getElementById('menuButton');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+  </script>
 </body>
 </html>
