@@ -2,8 +2,12 @@
 
 ## Demo
 <div style="display: flex;">
-    <img width="500" alt="Dashboard Screenshot" src="https://github.com/user-attachments/assets/a496f1c6-441d-48fa-a459-523f7dbe9250" />
-    <img width="500" alt="Execution Screenshot" src="https://github.com/user-attachments/assets/44b2b378-ff2f-4e7e-a02e-711c24484bb8" />
+    <img width="500" alt="Dashboard Screenshot" src="https://github.com/user-attachments/assets/752bed54-053e-4bc8-a212-93e460deef84" />
+    <img width="500" alt="Profile Screenshot" src="https://github.com/user-attachments/assets/b2e07ee1-124d-4fa4-8b7a-686c8f439857" />
+    <img width="500" alt="Friends Screenshot" src="https://github.com/user-attachments/assets/b7f624cb-e8e0-439c-81ea-31d4707635d0" />
+    <img width="500" alt="Execution Screenshot" src="https://github.com/user-attachments/assets/f9132809-6af0-414c-bb3f-e6bc77a2c84a" />
+    <img width="500" alt="Add Friends Screenshot" src="https://github.com/user-attachments/assets/22db9328-03e5-4e4b-910e-8da2f5ccd8ad" />
+    
 </div>
 
 ## Overview
