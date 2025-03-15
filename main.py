@@ -215,4 +215,4 @@ def handle_start_execution():
     socketio.start_background_task(target=background_execute_streak_recovery, selected=selected_friends)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5001, debug=True)
