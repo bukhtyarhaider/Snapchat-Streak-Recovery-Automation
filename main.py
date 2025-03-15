@@ -1,3 +1,4 @@
+import secrets
 import eventlet
 eventlet.monkey_patch()
 
@@ -16,7 +17,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
+app.config['SECRET_KEY'] = secrets.token_hex(16)
 socketio = SocketIO(app, async_mode='eventlet')
 
 # Files and column names
