@@ -6,10 +6,12 @@
   <title>SnapStreak Recovery Dashboard - SnapCovery</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
-        integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    body { font-family: 'Inter', sans-serif; background: #F0F4F8; }
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: #F0F4F8; 
+    }
     .card {
       background: white;
       border-radius: 1rem;
@@ -26,6 +28,9 @@
       background: #FFF200;
       transform: translateY(-2px);
     }
+    .icon-lg {
+      font-size: 2rem;
+    }
   </style>
 </head>
 <body>
@@ -33,13 +38,16 @@
   <nav class="bg-white fixed w-full z-50 shadow">
     <div class="container mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <i class="fab fa-snapchat fa-2x text-yellow-500"></i>
+        <i class="fab fa-snapchat icon-lg text-yellow-500"></i>
         <span class="text-2xl font-bold text-gray-800">SnapCovery</span>
       </div>
       <div class="hidden md:flex space-x-6">
-        <a href="{{ url_for('index') }}" class="text-gray-800 hover:text-amber-500 font-medium">Dashboard</a>
-        <a href="{{ url_for('profile') }}" class="text-gray-800 hover:text-amber-500 font-medium">Profile</a>
-        <a href="{{ url_for('friends_page') }}" class="text-gray-800 hover:text-amber-500 font-medium">Friends</a>
+        <a href="{{ url_for('index') }}" class="text-gray-800 hover:text-amber-500 font-medium">
+         Dashboard</a>
+        <a href="{{ url_for('profile') }}" class="text-gray-800 hover:text-amber-500 font-medium">
+        Profile</a>
+        <a href="{{ url_for('friends_page') }}" class="text-gray-800 hover:text-amber-500 font-medium">
+         Friends</a>
       </div>
       <div class="md:hidden">
         <button id="menuButton" class="text-gray-800 focus:outline-none">
@@ -67,17 +75,25 @@
     <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <!-- Profile Summary Card -->
       <div class="card p-8">
+        <div class="flex justify-center mb-4">
+          <i class="fas fa-user icon-lg text-amber-500"></i>
+        </div>
         <h2 class="text-2xl font-semibold text-center mb-4">Profile Summary</h2>
         <p class="text-center text-gray-800"><strong>Username:</strong> {{ user_details.MY_USERNAME or "Not set" }}</p>
         <p class="text-center text-gray-800"><strong>Email:</strong> {{ user_details.MY_EMAIL or "Not set" }}</p>
         <p class="text-center text-gray-800"><strong>Mobile:</strong> {{ user_details.MY_MOBILE or "Not set" }}</p>
         <div class="mt-6 text-center">
-          <a href="{{ url_for('profile') }}" class="snap-btn px-6 py-3 rounded">Update Profile</a>
+          <a href="{{ url_for('profile') }}" class="snap-btn px-6 py-3 rounded">
+            <i class="fas fa-edit mr-1"></i> Update Profile
+          </a>
         </div>
       </div>
 
       <!-- Friends Summary Card -->
       <div class="card p-8">
+        <div class="flex justify-center mb-4">
+          <i class="fas fa-users icon-lg text-amber-500"></i>
+        </div>
         <h2 class="text-2xl font-semibold text-center mb-4">Friends Summary</h2>
         <p class="text-center text-gray-800">
           <strong>Total Friends:</strong> {{ friends|length }}
@@ -86,20 +102,36 @@
           <strong>Selected Friends:</strong> {{ selected|length if selected is defined else 0 }}
         </p>
         <div class="mt-6 text-center">
-          <a href="{{ url_for('friends_page') }}" class="snap-btn px-6 py-3 rounded">Manage Friends</a>
+          <a href="{{ url_for('friends_page') }}" class="snap-btn px-6 py-3 rounded">
+            <i class="fas fa-cog mr-1"></i> Manage Friends
+          </a>
         </div>
       </div>
 
       <!-- Execute Recovery Card -->
       <div class="card p-8 flex flex-col justify-between">
+        <div class="flex justify-center mb-4">
+          <i class="fas fa-play icon-lg text-amber-500"></i>
+        </div>
         <h2 class="text-2xl font-semibold text-center mb-4">Execute Recovery</h2>
         <div class="mt-6 text-center">
           <a href="{{ url_for('execute_page') }}" class="snap-btn w-full px-6 py-3 rounded {% if friends|length == 0 %}opacity-50 cursor-not-allowed{% endif %}" {% if friends|length == 0 %}onclick="return false;"{% endif %}>
-            <i class="fas fa-play mr-2"></i>Execute Streak Recovery
+            <i class="fas fa-rocket mr-2"></i> Execute Streak Recovery
           </a>
         </div>
       </div>
     </div>
+
+    <!-- CTA Section for Chrome Extension -->
+    <section class="card p-8">
+      <h2 class="text-2xl font-semibold text-center mb-4">Export Your Snapchat Friends</h2>
+      <div class="text-center">
+        <p class="mb-4 text-gray-700">Use our open source Chrome extension to export your Snapchat friends to CSV. Then, import the CSV into SnapCovery for streak recovery.</p>
+        <a href="https://github.com/bukhtyarhaider/snapchat-friend-exporter" target="_blank" class="snap-btn inline-block px-6 py-3 rounded">
+          <i class="fab fa-github mr-2"></i> View Chrome Extension on GitHub
+        </a>
+      </div>
+    </section>
   </main>
 
   <script>
@@ -111,4 +143,3 @@
   </script>
 </body>
 </html>
-

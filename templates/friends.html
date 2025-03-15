@@ -6,7 +6,8 @@
   <title>Manage Snapchat Friends - SnapCovery</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
+        integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     body { font-family: 'Inter', sans-serif; background: #F0F4F8; }
     .nav-link:hover { color: #F59E0B; }
@@ -37,6 +38,17 @@
     .tab-btn.active {
       border-color: #FFFC00;
       color: #1F2937;
+    }
+    .search-input {
+      border: 2px solid #d1d5db;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+    .search-input:focus {
+      border-color: #FFFC00;
     }
   </style>
 </head>
@@ -70,49 +82,71 @@
   <header class="pt-24 pb-12 bg-gradient-to-r from-yellow-400 to-yellow-300">
     <div class="container mx-auto px-4 text-center">
       <h1 class="text-4xl font-extrabold text-gray-900">Manage Snapchat Friends</h1>
-      <p class="mt-2 text-lg text-gray-700">Easily add friends manually, import them via CSV, and select friends for recovery</p>
+      <p class="mt-2 text-lg text-gray-700">Add new friends or manage your existing friend lists for recovery</p>
     </div>
   </header>
 
   <!-- Main Content -->
   <main class="container mx-auto px-4 py-8 space-y-12">
-    <!-- Forms Section -->
-    <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2">
-      <!-- Manual Add Form -->
-      <div class="card p-8">
-        <h2 class="text-2xl font-semibold text-center mb-4">Add Friend Manually</h2>
-        <form method="POST">
-          <div class="flex flex-col gap-4">
-            <input type="text" name="friend_username" placeholder="Enter friend username" required class="border border-gray-300 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-300" />
-            <input type="text" name="friend_image" placeholder="Enter image URL (optional)" class="border border-gray-300 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-300" />
-            <button type="submit" class="snap-btn px-6 py-3 rounded">
-              <i class="fas fa-plus mr-2"></i> Add
+    <!-- Main Tabs -->
+    <div class="flex justify-center mb-8 space-x-6">
+      <button id="addTab" class="tab-btn">Add Friends</button>
+      <button id="manageTab" class="tab-btn active">Manage Friends</button>
+    </div>
+
+    <!-- Add Friends Tab Content -->
+    <div id="addContent" class="hidden">
+      <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2">
+        <!-- Manual Add Form -->
+        <div class="card p-8">
+          <h2 class="text-2xl font-semibold text-center mb-4">Add Friend Manually</h2>
+          <form method="POST">
+            <div class="flex flex-col gap-4">
+              <input type="text" name="friend_username" placeholder="Enter friend username" required class="border border-gray-300 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-300" />
+              <input type="text" name="friend_image" placeholder="Enter image URL (optional)" class="border border-gray-300 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-300" />
+              <button type="submit" class="snap-btn px-6 py-3 rounded">
+                <i class="fas fa-plus mr-2"></i> Add
+              </button>
+            </div>
+          </form>
+        </div>
+        <!-- CSV Import Form -->
+        <div class="card p-8">
+          <h2 class="text-2xl font-semibold text-center mb-4">Import Friends from CSV</h2>
+          <form method="POST" enctype="multipart/form-data">
+            <div class="mb-6">
+              <input type="file" name="csv_file" accept=".csv" required class="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-300" />
+            </div>
+            <button type="submit" class="snap-btn w-full px-6 py-3 rounded">
+              <i class="fas fa-upload mr-2"></i> Upload CSV
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-      <!-- CSV Import Form -->
-      <div class="card p-8">
-        <h2 class="text-2xl font-semibold text-center mb-4">Import Friends from CSV</h2>
-        <form method="POST" enctype="multipart/form-data">
-          <div class="mb-6">
-            <input type="file" name="csv_file" accept=".csv" required class="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-300" />
-          </div>
-          <button type="submit" class="snap-btn w-full px-6 py-3 rounded">
-            <i class="fas fa-upload mr-2"></i> Upload CSV
-          </button>
-        </form>
+      <!-- CTA for Chrome Extension -->
+      <div class="card p-8 mt-8">
+        <h2 class="text-2xl font-semibold text-center mb-4">Export Friends via Chrome Extension</h2>
+        <div class="text-center">
+          <p class="mb-4 text-gray-700">Export your Snapchat friends to CSV using our open source Chrome extension.</p>
+          <a href="https://github.com/bukhtyarhaider/snapchat-friend-exporter" target="_blank" class="snap-btn inline-block px-6 py-3 rounded">
+            Get the Extension
+          </a>
+        </div>
       </div>
     </div>
 
-    <!-- Friends Lists Section -->
-    <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2">
-      <!-- All Friends List -->
+    <!-- Manage Friends Tab Content -->
+    <div id="manageContent">
+      <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2">
+      <!-- All Friends List with Realtime Search -->
       <div class="card p-8">
         <h2 class="text-2xl font-semibold text-center mb-4">All Friends</h2>
-        <ul class="divide-y divide-gray-200">
+        <div class="mb-4">
+          <input type="text" id="searchInput" placeholder="Search friends..." class="search-input" />
+        </div>
+        <ul id="allFriendsList" class="divide-y divide-gray-200">
           {% for friend in friends %}
-          <li class="flex items-center justify-between py-3 px-4">
+          <li class="friend-item flex items-center justify-between py-3 px-4">
             <div class="flex items-center space-x-4">
               {% if friend.friend_image %}
               <img src="{{ friend.friend_image }}" alt="{{ friend.friend_username }}" class="w-10 h-10 rounded-full object-cover" />
@@ -129,7 +163,7 @@
                   <i class="fas fa-check"></i>
                 </button>
               </form>
-              <!-- Remove Friend from All Friends -->
+              <!-- Remove Friend -->
               <form method="POST" action="{{ url_for('remove_friend') }}">
                 <input type="hidden" name="friend_username" value="{{ friend.friend_username }}" />
                 <button type="submit" class="snap-btn px-4 py-2 rounded-full">
@@ -186,6 +220,7 @@
           </form>
         </div>
       </div>
+      </div>
     </div>
   </main>
 
@@ -193,28 +228,48 @@
     // Toggle mobile menu
     const menuButton = document.getElementById('menuButton');
     const mobileMenu = document.getElementById('mobileMenu');
-    menuButton.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
+    menuButton.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+
+    // Main tab switching logic
+    const addTab = document.getElementById('addTab');
+    const manageTab = document.getElementById('manageTab');
+    const addContent = document.getElementById('addContent');
+    const manageContent = document.getElementById('manageContent');
+    
+    // Default tab: Manage Friends is visible
+    addContent.classList.add('hidden');
+    manageContent.classList.remove('hidden');
+    addTab.classList.remove('active');
+    manageTab.classList.add('active');
+
+    addTab.addEventListener('click', () => {
+      addTab.classList.add('active');
+      manageTab.classList.remove('active');
+      addContent.classList.remove('hidden');
+      manageContent.classList.add('hidden');
+    });
+    
+    manageTab.addEventListener('click', () => {
+      manageTab.classList.add('active');
+      addTab.classList.remove('active');
+      manageContent.classList.remove('hidden');
+      addContent.classList.add('hidden');
     });
 
-    // Tab switching logic for forms (if needed)
-    const manualTab = document.getElementById('manualTab');
-    const csvTab = document.getElementById('csvTab');
-    const manualContent = document.getElementById('manualContent');
-    const csvContent = document.getElementById('csvContent');
-
-    manualTab.addEventListener('click', () => {
-      manualTab.classList.add('active');
-      csvTab.classList.remove('active');
-      manualContent.classList.remove('hidden');
-      csvContent.classList.add('hidden');
-    });
-
-    csvTab.addEventListener('click', () => {
-      csvTab.classList.add('active');
-      manualTab.classList.remove('active');
-      csvContent.classList.remove('hidden');
-      manualContent.classList.add('hidden');
+    // Realtime search for All Friends list
+    const searchInput = document.getElementById('searchInput');
+    const allFriendsList = document.getElementById('allFriendsList');
+    searchInput.addEventListener('input', () => {
+      const filter = searchInput.value.toLowerCase();
+      const items = allFriendsList.getElementsByClassName('friend-item');
+      Array.from(items).forEach(item => {
+        const friendName = item.querySelector('span').textContent.toLowerCase();
+        if (friendName.indexOf(filter) > -1) {
+          item.style.display = "";
+        } else {
+          item.style.display = "none";
+        }
+      });
     });
   </script>
 </body>
